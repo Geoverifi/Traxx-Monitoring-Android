@@ -1,0 +1,241 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.geoverifi.geoverifi.fragments.SubmissionDetailsFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/details_layout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1">
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Submission Date"
+                        android:textColor="@color/colorPrimary"
+                        android:textAllCaps="true"
+                        android:textSize="@dimen/details_size"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/submission_date"
+                        android:text="2017-07-21"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Media Owner"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/media_owner"
+                        android:text="12 x 10"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Town"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/town"
+                        android:text="Kakamega"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Brand"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/brand"
+                        android:text="12 x 10"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Structure"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/structure"
+                        android:text="12 x 10"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Material"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/material"
+                        android:text="2-Way"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Size"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/size"
+                        android:text="12 x 10"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Run Up"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        android:textAllCaps="true"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/run_up"
+                        android:text="10"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Illumination"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/illumination"
+                        android:text="Digital LED"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Visibility"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/visibility"
+                        android:text="Good/Average"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+
+                <TableRow
+                    android:paddingTop="@dimen/submission_item_margin_bottom"
+                    android:paddingBottom="@dimen/submission_item_margin_bottom">
+                    <TextView
+                        android:padding="3dip"
+                        android:text="Angle"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/details_size"
+                        />
+                    <TextView
+                        android:padding="3dip"
+                        android:id="@+id/angle"
+                        android:text="Driver's Left"
+                        android:textSize="@dimen/details_size"
+                        />
+                </TableRow>
+                <View
+                    android:layout_height="1dip"
+                    android:background="@color/colorPrimary" />
+            </TableLayout>
+
+            <TextView
+                android:layout_marginTop="@dimen/submission_item_margin_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Other Comments"
+                android:textSize="@dimen/details_size"
+                android:textColor="@color/colorPrimary"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/other_comments"
+                android:textSize="@dimen/details_size"
+                android:text="Sample comment"/>
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

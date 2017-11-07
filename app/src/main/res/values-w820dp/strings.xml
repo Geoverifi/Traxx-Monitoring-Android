@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="register">Create an Account</string>
+    <string name="site_reference_number">Site Reference Number</string>
+</resources>
