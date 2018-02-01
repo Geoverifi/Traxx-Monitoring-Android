@@ -1,10 +1,8 @@
 package com.geoverifi.geoverifi;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -40,8 +38,6 @@ import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.model.SubmissionPhoto;
 import com.geoverifi.geoverifi.util.FileUtils;
 
-import org.w3c.dom.Text;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +50,10 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implements View.OnClickListener {
     private int HIDE_MENU = 0;
-    int submission_id;
+    int submission_id,data_type_sides, submission_idb,submission_idc,newuser_id,draft;
+    String side,newtown,newbrand,newsubmission_date,newreference_number,newmedia_owner,newmedia_owner_name,newstructure,newsize,newmedia_size_other_height,newmedia_size_other_width,newmaterial,newrun_up,newillumination,newvisibility,newangle;
+    double newlatitude,newlongitude;
+
     DatabaseHandler db;
     Submission submission;
     GridView gridView;
@@ -88,6 +87,26 @@ public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implem
         db = new DatabaseHandler(this);
         submission = db.draftSubmission(submission_id);
         structure = db.getStructure(Integer.parseInt(submission.get_structure()));
+        side = getIntent().getStringExtra("side");
+        newtown = getIntent().getStringExtra("newtown");
+        newsubmission_date = getIntent().getStringExtra("newsubmission_date");
+        newreference_number = getIntent().getStringExtra("newreference_number");
+        newmedia_owner = getIntent().getStringExtra("newmedia_owner");
+        newmedia_owner_name = getIntent().getStringExtra("newmedia_owner_name");
+        newstructure = getIntent().getStringExtra("newstructure");
+        newsize = getIntent().getStringExtra("newsize");
+        newmedia_size_other_height = getIntent().getStringExtra("newmedia_size_other_height");
+        newmedia_size_other_width = getIntent().getStringExtra("newmedia_size_other_width");
+        newmaterial = getIntent().getStringExtra("newmaterial");
+        newrun_up = getIntent().getStringExtra("newrun_up");
+        newillumination = getIntent().getStringExtra("newillumination");
+        newvisibility = getIntent().getStringExtra("newvisibility");
+        newangle = getIntent().getStringExtra("newangle");
+        newlatitude = getIntent().getDoubleExtra("newlatitude", 0.0);
+        newlongitude = getIntent().getDoubleExtra("newlongitude", 0.0);
+        newuser_id = getIntent().getIntExtra("newuser_id", 0);
+        newbrand = getIntent().getStringExtra("newbrand");
+        draft = getIntent().getIntExtra("newdraft", 0);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -123,6 +142,27 @@ public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implem
             case android.R.id.home:
                 Intent intent = new Intent(MonitoringSubmissionPhotosActivity.this, MonitoringDataSubmission.class);
                 intent.putExtra("submission_id", submission_id);
+                intent.putExtra("data_type_sides", structure.get_type_sides());
+                intent.putExtra("side", side);
+                intent.putExtra("newtown", newtown);
+                intent.putExtra("newsubmission_date", newsubmission_date);
+                intent.putExtra("newreference_number", newreference_number);
+                intent.putExtra("newmedia_owner", newmedia_owner);
+                intent.putExtra("newmedia_owner_name", newmedia_owner_name);
+                intent.putExtra("newstructure", newstructure);
+                intent.putExtra("newsize", newsize);
+                intent.putExtra("newmedia_size_other_height", newmedia_size_other_height);
+                intent.putExtra("newmedia_size_other_width", newmedia_size_other_height);
+                intent.putExtra("newmaterial", newmaterial);
+                intent.putExtra("newrun_up", newrun_up);
+                intent.putExtra("newillumination", newillumination);
+                intent.putExtra("newvisibility", newvisibility);
+                intent.putExtra("newangle", newangle);
+                intent.putExtra("newlatitude", newlatitude);
+                intent.putExtra("newlongitude",newlongitude);
+                intent.putExtra("newuser_id", newuser_id);
+                intent.putExtra("newbrand", newbrand);
+
                 startActivity(intent);
                 break;
             case R.id.action_add_photo:
@@ -133,7 +173,7 @@ public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implem
                         public void run() {
                             if (structure.get_material_type().equals("Photos")) {
                                 dispatchTakePictureIntent();
-                            }else{
+                            }if (structure.get_material_type().equals("Videos")) {
                                 dispatchTakeVideoIntent();
                             }
                         }
@@ -151,6 +191,28 @@ public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implem
             case R.id.fab:
                 Intent intent = new Intent(MonitoringSubmissionPhotosActivity.this, MonitoringSubmissionReviewActivity.class);
                 intent.putExtra("submission_id", submission_id);
+                intent.putExtra("data_type_sides", structure.get_type_sides());
+                intent.putExtra("side",side);
+                intent.putExtra("newtown", newtown);
+                intent.putExtra("newsubmission_date", newsubmission_date);
+                intent.putExtra("newreference_number", newreference_number);
+                intent.putExtra("newmedia_owner", newmedia_owner);
+                intent.putExtra("newmedia_owner_name", newmedia_owner_name);
+                intent.putExtra("newstructure", newstructure);
+                intent.putExtra("newsize", newsize);
+                intent.putExtra("newmedia_size_other_height", newmedia_size_other_height);
+                intent.putExtra("newmedia_size_other_width", newmedia_size_other_height);
+                intent.putExtra("newmaterial", newmaterial);
+                intent.putExtra("newrun_up", newrun_up);
+                intent.putExtra("newillumination", newillumination);
+                intent.putExtra("newvisibility", newvisibility);
+                intent.putExtra("newangle", newangle);
+                intent.putExtra("newlatitude", newlatitude);
+                intent.putExtra("newlongitude",newlongitude);
+                intent.putExtra("newuser_id", newuser_id);
+                intent.putExtra("newbrand", newbrand);
+                intent.putExtra("newdraft", 0);
+
                 startActivity(intent);
                 break;
         }
@@ -322,11 +384,12 @@ public class MonitoringSubmissionPhotosActivity extends AppCompatActivity implem
     public void updateUI(){
         LinearLayout no_photos = (LinearLayout) findViewById(R.id.no_photos);
         LinearLayout video_layout = (LinearLayout) findViewById(R.id.video_view_layout);
-        if (structure.get_material_type() == "Photos") {
+
+        if (structure.get_material_type().equals("Photos")) {
             if (submissionPhotos.size() < structure.get_type_photos()) {
                 fab.setVisibility(View.GONE);
                 this.HIDE_MENU = 1;
-            } else if (submissionPhotos.size() == structure.get_type_photos()) {
+            } if (submissionPhotos.size() == structure.get_type_photos()) {
                 fab.setVisibility(View.VISIBLE);
                 this.HIDE_MENU = 0;
             }

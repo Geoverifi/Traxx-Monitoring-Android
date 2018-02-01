@@ -2,11 +2,12 @@ package com.geoverifi.geoverifi;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -44,8 +45,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         user_password = (EditText) findViewById(R.id.input_password);
         user_confirm_password = (EditText) findViewById(R.id.input_confirm_password);
         registerBtn = (Button) findViewById(R.id.createAccountBtn);
+        CheckBox check = findViewById(R.id.agreetopolicy);
 
         registerBtn.setOnClickListener(this);
+
+
     }
 
     private void registerUser(){
@@ -60,7 +64,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 try {
                     JSONObject responseObj = new JSONObject(response);
                     Toast.makeText(RegisterActivity.this, responseObj.getString("message"), Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                    startActivity(new Intent(RegisterActivity.this, RegThankyou.class));
                     finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -95,10 +99,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.createAccountBtn:
                 registerUser();
+
                 break;
         }
     }
+
+
+        /*check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                registerUser();
+
+            }
+        });*/
+
 }

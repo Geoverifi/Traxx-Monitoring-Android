@@ -1,7 +1,6 @@
 package com.geoverifi.geoverifi.sync;
 
 import android.accounts.Account;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
@@ -14,7 +13,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -23,9 +21,9 @@ import com.geoverifi.geoverifi.ErrorActivity;
 import com.geoverifi.geoverifi.R;
 import com.geoverifi.geoverifi.config.Variables;
 import com.geoverifi.geoverifi.db.DatabaseHandler;
+import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.provider.SubmissionPhotosProvider;
 import com.geoverifi.geoverifi.provider.SubmissionProvider;
-import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.server.client.SubmissionClient;
 import com.geoverifi.geoverifi.util.FileUtils;
 import com.geoverifi.geoverifi.util.Picture;
@@ -92,7 +90,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     params.put("media_owner", createPartFromString(media_owner_id));
                     params.put("media_owner_name", createPartFromString(submission.get_media_owner_name()));
                     params.put("structure_id", createPartFromString(submission.get_structure()));
-                    params.put("town", createPartFromString(submission.get_town()));
+                    params.put("town", createPartFromString(submission.get_town()));                    
                     params.put("media_size", createPartFromString(submission.get_size()));
                     params.put("media_size_other_height", createPartFromString(submission.get_media_size_other_height()));
                     params.put("media_size_other_width", createPartFromString(submission.get_media_size_other_width()));
@@ -105,8 +103,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     params.put("latitude", createPartFromString(submission.get_latitude()));
                     params.put("longitude", createPartFromString(submission.get_longitude()));
                     params.put("user_id", createPartFromString(String.valueOf(submission.get_user_id())));
+                    params.put("parentid", createPartFromString(String.valueOf(submission.get_parentid())));
+                    params.put("side", createPartFromString(submission.get_side()));
 
-                    List<MultipartBody.Part> parts = new ArrayList<>();
+                List<MultipartBody.Part> parts = new ArrayList<>();
                     Cursor submissionPhotosCursor = mContentResolver.query(SubmissionPhotosProvider.CONTENT_URI, null, DatabaseHandler.KEY_SUBMISSION_ID + "=?", new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHandler.KEY_ID)))}, null);
                     if (submissionPhotosCursor.moveToFirst()) {
 //                        Bitmap bitmap = BitmapFactory.decodeFile(submissionPhotosCursor.getString(submissionPhotosCursor.getColumnIndex(DatabaseHandler.KEY_THUMB)));

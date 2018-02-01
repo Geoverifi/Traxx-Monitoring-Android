@@ -1,52 +1,37 @@
 package com.geoverifi.geoverifi;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geoverifi.geoverifi.db.DatabaseHandler;
 import com.geoverifi.geoverifi.fragments.ConfirmLocationFragment;
-import com.geoverifi.geoverifi.fragments.LocationPreviewFragment;
 import com.geoverifi.geoverifi.fragments.ReviewDataFragment;
 import com.geoverifi.geoverifi.fragments.ReviewPhotoFragment;
+import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.provider.SubmissionProvider;
 import com.geoverifi.geoverifi.service.GPSTracker;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 public class MonitoringSubmissionReviewActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, ReviewDataFragment.OnFragmentInteractionListener, ReviewPhotoFragment.OnFragmentInteractionListener, ConfirmLocationFragment.OnCompleteListener {
-    int submission_id;
+    int submission_id,data_type_sides, submission_idb,submission_idc,newuser_id,draft;
+    String newside,newtown,newbrand,newsubmission_date,newreference_number,newmedia_owner,newmedia_owner_name,newstructure,newsize,newmedia_size_other_height,newmedia_size_other_width,newmaterial,newrun_up,newillumination,newvisibility,newangle;
+
+
+    double newlatitude,newlongitude;
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -54,6 +39,8 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
     private double longitude, latitude;
     DatabaseHandler db;
     GPSTracker gps;
+
+    Submission submission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,23 +53,50 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
 
         db = new DatabaseHandler(this);
 
-        getSupportActionBar().setTitle("SUBMISSION");
+        getSupportActionBar().setTitle("Monitoring");
         getSupportActionBar().setSubtitle("Review your submission");
 
         submission_id = getIntent().getIntExtra("submission_id", 0);
 
+        data_type_sides = getIntent().getIntExtra("data_type_sides", 0);
+        newside = getIntent().getStringExtra("side");
+        newtown = getIntent().getStringExtra("newtown");
+        newsubmission_date = getIntent().getStringExtra("newsubmission_date");
+        newreference_number = getIntent().getStringExtra("newreference_number");
+        newmedia_owner = getIntent().getStringExtra("newmedia_owner");
+        newmedia_owner_name = getIntent().getStringExtra("newmedia_owner_name");
+        newstructure = getIntent().getStringExtra("newstructure");
+        newsize = getIntent().getStringExtra("newsize");
+        newmedia_size_other_height = getIntent().getStringExtra("newmedia_size_other_height");
+        newmedia_size_other_width = getIntent().getStringExtra("newmedia_size_other_width");
+        newmaterial = getIntent().getStringExtra("newmaterial");
+        newrun_up = getIntent().getStringExtra("newrun_up");
+        newillumination = getIntent().getStringExtra("newillumination");
+        newvisibility = getIntent().getStringExtra("newvisibility");
+        newangle = getIntent().getStringExtra("newangle");
+        newlatitude = getIntent().getDoubleExtra("newlatitude", 0.0);
+        newlongitude = getIntent().getDoubleExtra("newlongitude", 0.0);
+        newuser_id = getIntent().getIntExtra("newuser_id", 0);
+        newbrand = getIntent().getStringExtra("newbrand");
+        draft =  getIntent().getIntExtra("newdraft", 0);
+
+
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Submission Data"));
-        tabLayout.addTab(tabLayout.newTab().setText("Photos"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        tabLayout.addTab(tabLayout.newTab().setText("Monitoring Data"));
+        tabLayout.addTab(tabLayout.newTab().setText("Photos"));
+
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         Pager adapter = new Pager(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(this);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         if (gps.canGetLocation()) {
             latitude = gps.getLatitude();
             longitude = gps.getLongitude();
@@ -94,22 +108,272 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
         }
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-//                db.changeOfflineStatus(submission_id, 0);
-                if (confirmed) {
-                    ContentValues values = new ContentValues();
+             if(newside == "A" && data_type_sides==2 || newside.equals("A") && data_type_sides==2 || newside == null && data_type_sides==2){
+                    //save data for side A
 
-                    values.put(DatabaseHandler.KEY_STATUS, 0);
 
-                    getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
-                    Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+                    if(draft==1){
+                        if (confirmed) {
+                            ContentValues values = new ContentValues();
 
-                    startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
-                    finish();
+                            values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                            getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, " A", Toast.LENGTH_SHORT).show();
+
+
+                            //startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmissionAuditing.class));
+                            //finish();
+                        } else {
+                            showConfirmLocation();
+                        }
+                        ContentValues values = new ContentValues();
+                        saveDraftB();
+                        values.put(DatabaseHandler.KEY_STATUS, -1);
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_idb)});
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Lets load page 2 other tabs", Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class);
+                        intent.putExtra("submission_id", submission_idb);
+                        intent.putExtra("data_type_sides", data_type_sides);
+                        intent.putExtra("side", "B");
+                        intent.putExtra("newdraft", "1");
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        if (confirmed) {
+                            ContentValues values = new ContentValues();
+
+                            values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                            getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, " b", Toast.LENGTH_SHORT).show();
+
+
+                           // startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
+                           // finish();
+
+
+                        } else {
+                            showConfirmLocation();
+                        }
+                        if(data_type_sides==2){
+                            ContentValues values = new ContentValues();
+                            saveDraftB();
+                            values.put(DatabaseHandler.KEY_STATUS, -1);
+                            getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_idb)});
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, "Lets load page 2 other tabs", Toast.LENGTH_SHORT).show();
+
+
+                            Intent intent = new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class);
+                            intent.putExtra("submission_id", submission_idb);
+                            intent.putExtra("data_type_sides", data_type_sides);
+                            intent.putExtra("side", "B");
+                            intent.putExtra("newdraft", "1");
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+
+                    //create draft for side B
+                }
+                else if(newside=="B" && data_type_sides==2 || newside.equals("B")  && data_type_sides==2){
+                    // save data for B
+
+                    if (confirmed) {
+                        ContentValues values = new ContentValues();
+
+                        values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, " c", Toast.LENGTH_SHORT).show();
+
+
+                        startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
+                        finish();
+                    } else {
+                        showConfirmLocation2();
+                    }
+
+
+                    // clear
+                }
+                else if(newside == "A" && data_type_sides==3 || newside.equals("A") && data_type_sides==3 || newside==null && data_type_sides==3){
+
+                    //create draft for side B
+
+
+                    if(draft==1){
+
+                        //save data for side A
+
+                        if (confirmed) {
+                            ContentValues values = new ContentValues();
+
+                            values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                            getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, " d", Toast.LENGTH_SHORT).show();
+
+                            //startActivity(new Intent(MonitoringSubmissionReviewAuditingActivity.this, MonitoringDataSubmissionAuditing.class));
+                            //finish();
+                        } else {
+                            showConfirmLocation();
+                        }
+                        ContentValues values = new ContentValues();
+                        saveDraftB();
+                        values.put(DatabaseHandler.KEY_STATUS, -1);
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_idb)});
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Lets load page 2 other tabs", Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class);
+                        intent.putExtra("submission_id", submission_idb);
+                        intent.putExtra("data_type_sides", data_type_sides);
+                        intent.putExtra("side", "B");
+                        intent.putExtra("newdraft", "1");
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        //save data for side A
+
+
+                        if (confirmed) {
+                            ContentValues values = new ContentValues();
+
+                            values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                            getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(MonitoringSubmissionReviewActivity.this, " e", Toast.LENGTH_SHORT).show();
+
+                            startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
+                            finish();
+                        } else {
+                            showConfirmLocation();
+                        }
+
+                        ContentValues values = new ContentValues();
+                        saveDraftB();
+                        values.put(DatabaseHandler.KEY_STATUS, -1);
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_idb)});
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Lets load page 2 other tabs", Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class);
+                        intent.putExtra("submission_id", submission_idb);
+                        intent.putExtra("data_type_sides", data_type_sides);
+                        intent.putExtra("side", "B");
+                        intent.putExtra("newdraft", "1");
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                else if(newside=="B" && data_type_sides==3 || newside.equals("B")  && data_type_sides==3){
+                    // save data for B
+
+                    if (confirmed) {
+                        ContentValues values = new ContentValues();
+
+                        values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, " f", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+
+
+                        //startActivity(new Intent(MonitoringSubmissionReviewAuditingActivity.this, MonitoringDataSubmissionAuditing.class));
+                        //finish();
+                    } else {
+                        showConfirmLocation2();
+                    }
+
+
+                    // create draft for c
+                    if(draft==1){
+
+                        ContentValues values = new ContentValues();
+                        saveDraftC();
+                        values.put(DatabaseHandler.KEY_STATUS, -1);
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_idc)});
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Lets load page 2 other tabs", Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class);
+                        intent.putExtra("submission_id", submission_idc);
+                        intent.putExtra("data_type_sides", data_type_sides);
+                        intent.putExtra("side", "C");
+                        intent.putExtra("newdraft", "1");
+                        startActivity(intent);
+                        finish();
+                    }
+                }else if(newside=="C" && data_type_sides==3 || newside.equals("C")  && data_type_sides==3){
+                    // save data for C
+
+                    if (confirmed) {
+                        ContentValues values = new ContentValues();
+
+                        values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, " g", Toast.LENGTH_SHORT).show();
+
+                        startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
+                        finish();
+                    } else {
+                        showConfirmLocation2();
+                    }
+                    // clear
                 }else{
-                    showConfirmLocation();
+                    if (confirmed) {
+                        ContentValues values = new ContentValues();
+
+                        values.put(DatabaseHandler.KEY_STATUS, 0);
+
+                        getContentResolver().update(SubmissionProvider.CONTENT_URI, values, DatabaseHandler.KEY_ID + "=?", new String[]{String.valueOf(submission_id)});
+
+
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "Data Uploaded", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MonitoringSubmissionReviewActivity.this, "h", Toast.LENGTH_SHORT).show();
+
+
+                        startActivity(new Intent(MonitoringSubmissionReviewActivity.this, MonitoringDataSubmission.class));
+                        finish();
+                    } else {
+                        showConfirmLocation();
+                    }
+
                 }
             }
         });
@@ -124,6 +388,15 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
         fragment.show(getFragmentManager(), "LocationPreviewDialog");
     }
 
+
+    private void showConfirmLocation2() {
+        ConfirmLocationFragment fragment = ConfirmLocationFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putDouble("latitude", newlatitude);
+        bundle.putDouble("longitude", newlongitude);
+        fragment.setArguments(bundle);
+        fragment.show(getFragmentManager(), "LocationPreviewDialog");
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.review_menu, menu);
@@ -132,13 +405,16 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_edit:
-                Intent intent = new Intent(this, MonitoringDataSubmission.class);
-                intent.putExtra("submission_id", submission_id);
-                startActivity(intent);
-                break;
-        }
+
+            switch (item.getItemId()) {
+                case R.id.action_edit:
+                    Intent intent = new Intent(this, MonitoringDataSubmission.class);
+                    intent.putExtra("submission_id", submission_id);
+                    intent.putExtra("side", newside);
+                    startActivity(intent);
+                    break;
+            }
+
         return true;
     }
 
@@ -184,24 +460,147 @@ public class MonitoringSubmissionReviewActivity extends AppCompatActivity implem
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
             bundle.putInt("submission_id", submission_id);
-            switch (position){
-                case 0:
-                    ReviewDataFragment reviewDataFragment = new ReviewDataFragment();
-                    reviewDataFragment.setArguments(bundle);
-                    return reviewDataFragment;
-                case 1:
-                    ReviewPhotoFragment reviewPhotoFragment = new ReviewPhotoFragment();
-                    reviewPhotoFragment.setArguments(bundle);
-                    return reviewPhotoFragment;
-                default:
-                    return null;
-            }
+
+             switch (position) {
+                    case 0:
+                        ReviewDataFragment reviewDataFragment = new ReviewDataFragment();
+                        reviewDataFragment.setArguments(bundle);
+                        return reviewDataFragment;
+                    case 1:
+                        ReviewPhotoFragment reviewPhotoFragment = new ReviewPhotoFragment();
+                        reviewPhotoFragment.setArguments(bundle);
+                        return reviewPhotoFragment;
+
+                    default:
+                        return null;
+                }
+
+
         }
 
         @Override
         public int getCount() {
             return tabCount;
         }
+    }
+
+
+    private void saveDraftB() {
+
+        long id = db.addDraftSubmission(getInputB());
+
+        submission_idb = Integer.valueOf(String.valueOf(id));
+
+        Toast.makeText(this, "Saved to draft b", Toast.LENGTH_SHORT).show();}
+
+    private void updateDraftB(){
+
+
+        db.updatedDraftSubmission(getInputB());
+
+        Toast.makeText(this, "Updated draft b", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private Submission getInputB(){
+
+
+        Submission inputSubmission = new Submission();
+
+        Log.d("b", String.valueOf(submission_idb));
+
+        inputSubmission.set_id(submission_idb);
+        inputSubmission.set_submission_date(newsubmission_date);
+        inputSubmission.set_site_reference_number(newreference_number);
+        inputSubmission.set_brand(newbrand);
+        inputSubmission.set_media_owner(newmedia_owner);
+        inputSubmission.set_media_owner_name(newmedia_owner_name);
+        inputSubmission.set_structure(newstructure);
+        inputSubmission.set_town(newtown);
+        inputSubmission.set_size(newsize);
+        inputSubmission.set_media_size_other_height(newmedia_size_other_height);
+        inputSubmission.set_media_size_other_width(newmedia_size_other_width);
+        inputSubmission.set_material(newmaterial);
+        inputSubmission.set_run_up(newrun_up);
+        inputSubmission.set_illumination(newillumination);
+        inputSubmission.set_visibility(newvisibility);
+        if(data_type_sides == 1){
+            inputSubmission.set_angle("2");
+        }
+        else if(data_type_sides == 2 || data_type_sides == 3){
+            inputSubmission.set_angle("1");
+        }
+        else{
+            inputSubmission.set_angle("2");
+        }
+        inputSubmission.set_other_comments("");
+        inputSubmission.set_latitude(String.valueOf(newlatitude));
+        inputSubmission.set_longitude(String.valueOf(newlongitude));
+        inputSubmission.set_user_id(newuser_id);
+        inputSubmission.set_status(-1);
+        inputSubmission.set_side("B");
+        inputSubmission.set_parentid(submission_id);
+
+        return inputSubmission;
+    }
+
+    private Submission getInputC(){
+
+
+        Submission inputSubmission = new Submission();
+
+        inputSubmission.set_submission_date(newsubmission_date);
+        inputSubmission.set_site_reference_number(newreference_number);
+        inputSubmission.set_brand(newbrand);
+        inputSubmission.set_media_owner(newmedia_owner);
+        inputSubmission.set_media_owner_name(newmedia_owner_name);
+        inputSubmission.set_structure(newstructure);
+        inputSubmission.set_town(newtown);
+        inputSubmission.set_size(newsize);
+        inputSubmission.set_media_size_other_height(newmedia_size_other_height);
+        inputSubmission.set_media_size_other_width(newmedia_size_other_width);
+        inputSubmission.set_material(newmaterial);
+        inputSubmission.set_run_up(newrun_up);
+        inputSubmission.set_illumination(newillumination);
+        inputSubmission.set_visibility(newvisibility);
+        if(data_type_sides == 1) {
+            inputSubmission.set_angle("2");
+        }
+        else if(data_type_sides == 2 || data_type_sides == 3){
+            inputSubmission.set_angle("1");
+        }
+
+        else{
+            inputSubmission.set_angle("2");
+        }
+        inputSubmission.set_other_comments("");
+        inputSubmission.set_latitude(String.valueOf(newlatitude));
+        inputSubmission.set_longitude(String.valueOf(newlongitude));
+        inputSubmission.set_user_id(newuser_id);
+        inputSubmission.set_status(-1);
+        inputSubmission.set_side("C");
+        inputSubmission.set_parentid(submission_id);
+
+        return inputSubmission;
+    }
+
+
+    private void saveDraftC() {
+        ContentValues values = new ContentValues();
+        //querry database
+
+        long id = db.addDraftSubmission(getInputC());
+
+        submission_id = Integer.valueOf(String.valueOf(id));
+
+        Toast.makeText(this, "Saved to draftc", Toast.LENGTH_SHORT).show();}
+
+    private void updateDraftC(){
+
+
+        db.updatedDraftSubmission(getInputC());
+
+        Toast.makeText(this, "Updated draft", Toast.LENGTH_SHORT).show();
     }
 
 }

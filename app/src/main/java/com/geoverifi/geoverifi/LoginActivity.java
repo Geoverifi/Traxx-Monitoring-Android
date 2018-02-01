@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     TextView txtEmail;
     TextView txtPassword;
     TextView txtRegister;
+    TextView forgotpassword;
 
     Context c = this;
 
@@ -48,9 +52,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         txtEmail = (TextView) findViewById(R.id.input_email);
         txtPassword = (TextView) findViewById(R.id.input_password);
         txtRegister = (TextView) findViewById(R.id.registerBtn);
+        forgotpassword = (TextView) findViewById(R.id.forgotpasswordtxt);
 
         loginBtn.setOnClickListener(this);
         txtRegister.setOnClickListener(this);
+        forgotpassword.setOnClickListener(this);
+
+
+        TextView HyperLink;
+        Spanned Text;
+        HyperLink = (TextView)findViewById(R.id.powered);
+
+        Text = Html.fromHtml("<a href='http://geoverifi.com'>www.geoverifi.com</a>");
+
+        HyperLink.setMovementMethod(LinkMovementMethod.getInstance());
+        HyperLink.setText(Text);
     }
 
     @Override
@@ -61,6 +77,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.registerBtn:
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                break;
+            case R.id.forgotpasswordtxt:
+                startActivity(new Intent(LoginActivity.this, ForgotPassword.class));
                 break;
         }
     }

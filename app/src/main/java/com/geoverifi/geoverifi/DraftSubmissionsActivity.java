@@ -3,9 +3,8 @@ package com.geoverifi.geoverifi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +69,7 @@ public class DraftSubmissionsActivity extends AppCompatActivity implements Adapt
 
         Intent intent = new Intent(this, MonitoringDataSubmission.class);
         intent.putExtra("submission_id", submission.get_id());
+        intent.putExtra("side", submission.get_side());
         startActivity(intent);
         finish();
     }

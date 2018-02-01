@@ -48,6 +48,7 @@ public class OfflineSubmissionsAdapater extends RecyclerView.Adapter<OfflineSubm
             holder.txtSubmissionDate.setText(submission.get_submission_date());
             holder.txtBrandMediaOwner.setText(submission.get_brand() + " " + mediaOwner.get_media_owner());
             holder.txtTown.setText(submission.get_town());
+            holder.txtCounty.setText(submission.get_town());
         }catch (Exception ex){
             Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -60,7 +61,7 @@ public class OfflineSubmissionsAdapater extends RecyclerView.Adapter<OfflineSubm
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
-        TextView txtBrandMediaOwner, txtTown, txtSubmissionDate, txtStructure;
+        TextView txtBrandMediaOwner, txtTown, txtCounty, txtSubmissionDate, txtStructure;
 
         public MyViewHolder(View itemView) {
             super(itemView);

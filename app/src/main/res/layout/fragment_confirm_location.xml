@@ -49,4 +49,11 @@
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/savedarft"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Draft"/>
+
 </LinearLayout>

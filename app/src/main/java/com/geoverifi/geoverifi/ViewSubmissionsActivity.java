@@ -3,10 +3,9 @@ package com.geoverifi.geoverifi;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -206,6 +205,8 @@ public class ViewSubmissionsActivity extends AppCompatActivity implements Search
                                 submission.set_photo_2(submissionObj.getString("photo_2"));
                                 submission.set_created_at(submissionObj.getString("created_at"));
 
+                                submission.set_parentid(submissionObj.getInt("parentid"));
+                                submission.set_side(submissionObj.getString("side"));
                                 db.addSubmission(submission);
                                 submissionList.add(submission);
                             }

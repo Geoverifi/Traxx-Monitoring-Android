@@ -4,13 +4,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,20 +19,10 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.geoverifi.geoverifi.adapter.OfflineSubmissionsAdapater;
-import com.geoverifi.geoverifi.app.AppController;
-import com.geoverifi.geoverifi.app.VolleyMultipartRequest;
 import com.geoverifi.geoverifi.config.Variables;
 import com.geoverifi.geoverifi.db.DatabaseHandler;
-import com.geoverifi.geoverifi.helper.InternetChecker;
 import com.geoverifi.geoverifi.model.Submission;
-import com.geoverifi.geoverifi.module.AppHelper;
 import com.geoverifi.geoverifi.server.client.SubmissionClient;
 import com.geoverifi.geoverifi.util.DividerItemDecoration;
 import com.geoverifi.geoverifi.util.FileUtils;
@@ -43,7 +32,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -162,6 +150,8 @@ public class OfflineDataActivity extends AppCompatActivity {
         params.put("latitude", createPartFromString(s.get_latitude()));
         params.put("longitude", createPartFromString(s.get_longitude()));
         params.put("user_id", createPartFromString(String.valueOf(s.get_user_id())));
+        params.put("parentid", createPartFromString(String.valueOf(s.get_parentid())));
+        params.put("side", createPartFromString(s.get_side()));
 
 
         final Bitmap bmp_photo_1 = decodeFile(s.get_photo_1());

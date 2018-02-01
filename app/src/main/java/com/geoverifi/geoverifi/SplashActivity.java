@@ -2,8 +2,8 @@ package com.geoverifi.geoverifi;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +19,15 @@ import com.geoverifi.geoverifi.model.Illumination;
 import com.geoverifi.geoverifi.model.Material;
 import com.geoverifi.geoverifi.model.MaterialStatus;
 import com.geoverifi.geoverifi.model.MediaOwner;
-import com.geoverifi.geoverifi.model.Menu;
 import com.geoverifi.geoverifi.model.RunUp;
 import com.geoverifi.geoverifi.model.Size;
 import com.geoverifi.geoverifi.model.Structure;
 import com.geoverifi.geoverifi.model.StructureCondition;
 import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.model.SubmissionPhoto;
+import com.geoverifi.geoverifi.model.SubmissionAuditing;
+import com.geoverifi.geoverifi.model.TrafficQuantity;
+import com.geoverifi.geoverifi.model.TrafficSpeed;
 import com.geoverifi.geoverifi.model.Visibility;
 
 import org.json.JSONArray;
@@ -45,11 +47,14 @@ public class SplashActivity extends AppCompatActivity {
     public void initialize(Context context){
         DatabaseHandler db = new DatabaseHandler(context);
 //        db.clearDatabase();
-        if (db.getMenuCount() == 0 || db.allMediaOwners().size() == 0){
+        if (db.getmainMenuCount() == 0 || db.allMediaOwners().size() == 0){
 //            Toast.makeText(context, "Does not exist", Toast.LENGTH_SHORT).show();
             // Add Menu Items
-            DataInitializer.getInstance(context, false).setupMenu();
+            DataInitializer.getInstance(context, false).setupMenuMain();
+            DataInitializer.getInstance(context, false).setupMenuItraxx();
+            DataInitializer.getInstance(context, false).setupMenuUtraxx();
             getBaseData(db);
+            getBaseauditingData(db);
         }else{
             startActivity(new Intent(context, MainActivity.class));
             finish();
@@ -110,6 +115,8 @@ public class SplashActivity extends AppCompatActivity {
 
                         db.addAngle(angle);
                     }
+
+
                     for (int i = 0; i < illuminations.length(); i++) {
                         Illumination illumination = new Illumination();
                         JSONObject illuminationObj = illuminations.getJSONObject(i);
@@ -223,6 +230,109 @@ public class SplashActivity extends AppCompatActivity {
 
                         db.addPhoto(photo);
                     }
+
+                   // startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    //finish();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(SplashActivity.this, "There was an error pulling data", Toast.LENGTH_LONG).show();
+                System.out.println("====>" + error.getMessage());
+            }
+        });
+
+        AppController.getInstance().addToRequestQueue(request);
+    }
+
+    public void getBaseauditingData(final DatabaseHandler db){
+        String urls = Variables.BASE_URL + "API/getBaseauditingData";
+        //final TextView splash_waiting = (TextView) findViewById(R.id.splash_wait);
+
+        JsonObjectRequest request = new JsonObjectRequest(urls, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject dataObj1 = response.getJSONObject("data");
+
+                    JSONArray submissions = dataObj1.getJSONArray("auditing");
+                    JSONArray traffic_quality = dataObj1.getJSONArray("traffic_quantity");
+                    JSONArray traffic_speed = dataObj1.getJSONArray("traffic_speed");
+
+                    JSONArray auditing_photos = dataObj1.getJSONArray("auditing_photos");
+
+
+                    for (int i = 0; i < traffic_quality.length(); i++) {
+                        TrafficQuantity trafficQuantity = new TrafficQuantity();
+                        JSONObject traffic_qualityObj = traffic_quality.getJSONObject(i);
+
+                        trafficQuantity.set_id(traffic_qualityObj.getInt("id"));
+                        trafficQuantity.set_traffic_quantity(traffic_qualityObj.getString("traffic_quantity"));
+
+                        db.addTrafficQuantity(trafficQuantity);
+                    }
+
+                    for (int i = 0; i < traffic_speed.length(); i++) {
+                        TrafficSpeed trafficSpeed = new TrafficSpeed();
+                        JSONObject traffic_speedObj = traffic_speed.getJSONObject(i);
+
+                        trafficSpeed.set_id(traffic_speedObj.getInt("id"));
+                        trafficSpeed.set_traffic_speed(traffic_speedObj.getString("traffic_speed"));
+
+                        db.addTrafficSpeed(trafficSpeed);
+                    }
+
+
+                    for (int i = 0; i < submissions.length(); i++) {
+                        SubmissionAuditing submission = new SubmissionAuditing();
+                        JSONObject submissionObj = submissions.getJSONObject(i);
+
+                        submission.set_id(submissionObj.getInt("id"));
+                        submission.set_user_id(submissionObj.getInt("user_id"));
+                        submission.set_submission_date(submissionObj.getString("submission_date"));
+                        submission.set_brand(submissionObj.getString("brand"));
+                        submission.set_media_owner(submissionObj.getString("media_owner"));
+                        submission.set_town(submissionObj.getString("town"));
+                        submission.set_structure(submissionObj.getString("type_name"));
+                        submission.set_size(submissionObj.getString("size"));
+                        submission.set_media_size_other_height(submissionObj.getString("media_size_height"));
+                        submission.set_media_size_other_width(submissionObj.getString("media_size_width"));
+                        submission.set_material(submissionObj.getString("material"));
+                        submission.set_run_up(submissionObj.getString("run_up"));
+                        submission.set_illumination(submissionObj.getString("illumination"));
+                        submission.set_visibility(submissionObj.getString("visibility"));
+                        submission.set_angle(submissionObj.getString("angle"));
+                        submission.set_other_comments(submissionObj.getString("other_comments"));
+                        submission.set_user_firstname(submissionObj.getString("user_firstname"));
+                        submission.set_user_lastname(submissionObj.getString("user_lastname"));
+                        submission.set_latitude(submissionObj.getString("latitude"));
+                        submission.set_longitude(submissionObj.getString("longitude"));
+                        submission.set_photo_1(submissionObj.getString("photo_1"));
+                        submission.set_photo_2(submissionObj.getString("photo_2"));
+                        submission.set_created_at(submissionObj.getString("created_at"));
+                        submission.set_trafficquantity(submissionObj.getString("traffic_quantity"));
+                        submission.set_trafficspeed(submissionObj.getString("traffic_speed"));
+                        db.addSubmissionAuditing(submission);
+                    }
+
+                    /*for (int i = 0; i < auditing_photos.length(); i++) {
+                        SubmissionPhotoAuditing photo = new SubmissionPhotoAuditing();
+                        JSONObject submissionPhotoObj =auditing_photos.getJSONObject(i);
+
+                        photo.setId(submissionPhotoObj.getInt("id"));
+                        photo.setName(submissionPhotoObj.getString("name"));
+                        photo.setSubmission_id(submissionPhotoObj.getInt("submission_id"));
+                        photo.setThumb(submissionPhotoObj.getString("image_thumb"));
+                        photo.setPath(submissionPhotoObj.getString("image_url"));
+                        photo.setCreated_at(submissionPhotoObj.getString("uploaded_at"));
+
+                        db.addAuditingPhoto(photo);
+                    }*/
+
 
                     startActivity(new Intent(SplashActivity.this, MainActivity.class));
                     finish();

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geoverifi.geoverifi.MainActivity;
 import com.geoverifi.geoverifi.R;
 
 import java.io.IOException;
@@ -64,6 +66,8 @@ public class ConfirmLocationFragment extends DialogFragment {
         final EditText etxLatitude = (EditText) view.findViewById(R.id.input_latitude);
         final EditText etxLongitude = (EditText) view.findViewById(R.id.input_longitude);
         Button btnGetDetails = (Button) view.findViewById(R.id.get_location_details);
+        Button btnsavedarft = (Button) view.findViewById(R.id.savedarft);
+
         final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progress);
 
         etxLatitude.setText(String.valueOf(latitude));
@@ -76,7 +80,7 @@ public class ConfirmLocationFragment extends DialogFragment {
                 try {
                     List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
-                    if (addresses.size() > 0){
+                    if (addresses.size() > 0) {
                         String town = addresses.get(0).getLocality();
                         String county = addresses.get(0).getAdminArea();
                         txtLocationText.setText(town + ", " + county);
@@ -91,6 +95,15 @@ public class ConfirmLocationFragment extends DialogFragment {
             }
         });
 
+        btnsavedarft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intenti = new Intent(getActivity(), MainActivity.class);
+                startActivity(intenti);
+            }
+        });
+
+
         txtTitleText.setText("Confirm the location");
         return new android.support.v7.app.AlertDialog.Builder(getActivity())
                 .setCancelable(false)
@@ -103,6 +116,7 @@ public class ConfirmLocationFragment extends DialogFragment {
                     }
                 })
                 .create();
+
     }
 
     public static interface OnCompleteListener{

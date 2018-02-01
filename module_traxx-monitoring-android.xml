@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_traxx-monitoring-android" default="compile.module.traxx-monitoring-android">
+  <dirname property="module.traxx-monitoring-android.basedir" file="${ant.file.module_traxx-monitoring-android}"/>
+  
+  <property name="module.jdk.home.traxx-monitoring-android" value="${jdk.home.1.8}"/>
+  <property name="module.jdk.bin.traxx-monitoring-android" value="${jdk.bin.1.8}"/>
+  <property name="module.jdk.classpath.traxx-monitoring-android" value="jdk.classpath.1.8"/>
+  
+  <property name="compiler.args.traxx-monitoring-android" value="-encoding UTF-8 -source 1.7 -target 1.7 ${compiler.args}"/>
+  
+  <property name="traxx-monitoring-android.output.dir" value="${module.traxx-monitoring-android.basedir}/build/classes/production/Traxx-Monitoring-Android"/>
+  <property name="traxx-monitoring-android.testoutput.dir" value="${module.traxx-monitoring-android.basedir}/build/classes/test/Traxx-Monitoring-Android"/>
+  
+  <path id="traxx-monitoring-android.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="traxx-monitoring-android.module.production.classpath">
+    <path refid="${module.jdk.classpath.traxx-monitoring-android}"/>
+  </path>
+  
+  <path id="traxx-monitoring-android.runtime.production.module.classpath">
+    <pathelement location="${traxx-monitoring-android.output.dir}"/>
+  </path>
+  
+  <path id="traxx-monitoring-android.module.classpath">
+    <path refid="${module.jdk.classpath.traxx-monitoring-android}"/>
+    <pathelement location="${traxx-monitoring-android.output.dir}"/>
+  </path>
+  
+  <path id="traxx-monitoring-android.runtime.module.classpath">
+    <pathelement location="${traxx-monitoring-android.testoutput.dir}"/>
+    <pathelement location="${traxx-monitoring-android.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.traxx-monitoring-android">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.traxx-monitoring-android">
+    <patternset refid="excluded.from.module.traxx-monitoring-android"/>
+  </patternset>
+  
+  
+  <target name="compile.module.traxx-monitoring-android" depends="compile.module.traxx-monitoring-android.production,compile.module.traxx-monitoring-android.tests" description="Compile module Traxx-Monitoring-Android"/>
+  
+  <target name="compile.module.traxx-monitoring-android.production" depends="register.custom.compilers" description="Compile module Traxx-Monitoring-Android; production classes"/>
+  
+  <target name="compile.module.traxx-monitoring-android.tests" depends="register.custom.compilers,compile.module.traxx-monitoring-android.production" description="compile module Traxx-Monitoring-Android; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.traxx-monitoring-android" description="cleanup module">
+    <delete dir="${traxx-monitoring-android.output.dir}"/>
+    <delete dir="${traxx-monitoring-android.testoutput.dir}"/>
+  </target>
+</project>

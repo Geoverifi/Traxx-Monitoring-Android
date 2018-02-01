@@ -1,5 +1,6 @@
 package com.geoverifi.geoverifi.model;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -7,11 +8,12 @@ import android.os.Parcelable;
  * Created by chriz on 7/17/2017.
  */
 
+@SuppressLint("ParcelCreator")
 public class Submission implements Parcelable {
 
-    private int _id, _user_id, _status;
-    private String _brand, _media_owner, _town, _submission_date, _created_at, _structure, _size, _user_firstname, _user_lastname, _media_size_other_height, _media_size_other_width, _material,
-    _run_up, _illumination, _angle, _other_comments, _visibility, _latitude, _longitude, _photo_1, _photo_2, _site_id, _site_reference_number, _media_owner_name;
+    private int _id, _user_id, _status,_parentid;
+    private String _brand, _media_owner, _town,  _submission_date, _created_at, _structure, _size, _user_firstname, _user_lastname, _media_size_other_height, _media_size_other_width, _material,
+            _run_up, _illumination, _angle, _other_comments, _visibility, _latitude, _longitude, _photo_1, _photo_2, _site_id, _site_reference_number, _media_owner_name,_side, _traffic_quantity, _traffic_speed;
 
     public int get_id() {
         return _id;
@@ -52,6 +54,7 @@ public class Submission implements Parcelable {
     public void set_town(String _town) {
         this._town = _town;
     }
+
 
     public String get_submission_date() {
         return _submission_date;
@@ -196,6 +199,24 @@ public class Submission implements Parcelable {
     public void set_photo_2(String _photo_2) {
         this._photo_2 = _photo_2;
     }
+
+
+    public String get_side() {
+        return _side;
+    }
+
+    public void set_side(String _side) {
+        this._side = _side;
+    }
+
+    public int get_parentid() {
+        return _parentid;
+    }
+
+    public void set_parentid(int _parentid) {
+        this._parentid = _parentid;
+    }
+
 
     @Override
     public int describeContents() {

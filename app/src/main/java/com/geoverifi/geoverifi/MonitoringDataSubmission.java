@@ -6,11 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.ContactsContract;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,7 +19,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +35,7 @@ import com.geoverifi.geoverifi.adapter.StructureSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.VisibilitySpinnerAdapter;
 import com.geoverifi.geoverifi.db.DatabaseHandler;
 import com.geoverifi.geoverifi.fragments.LocationPreviewFragment;
-import com.geoverifi.geoverifi.helper.DateHelper;
+import com.geoverifi.geoverifi.helper.InternetChecker;
 import com.geoverifi.geoverifi.model.Angle;
 import com.geoverifi.geoverifi.model.Illumination;
 import com.geoverifi.geoverifi.model.Material;
@@ -46,24 +46,26 @@ import com.geoverifi.geoverifi.model.Structure;
 import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.model.User;
 import com.geoverifi.geoverifi.model.Visibility;
-import com.geoverifi.geoverifi.provider.SubmissionProvider;
 import com.geoverifi.geoverifi.service.GPSTracker;
 import com.geoverifi.geoverifi.sharedpreference.Manager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.List;
+import java.util.Locale;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class MonitoringDataSubmission extends AppCompatActivity implements View.OnClickListener, LocationPreviewFragment.OnCompleteListener {
     GPSTracker gps;
-    double latitude, longitude;
+    double latitude, longitude,newlatitude,newlongitude;
     DatabaseHandler db;
     AutoCompleteTextView autoCompleteTextView;
 
-    int submission_id;
+    int submission_id,data_type_sides,newuser_id,draft;
+    String side,newtown,newbrand,newsubmission_date,newreference_number,newmedia_owner,newmedia_owner_name,newstructure,newsize,newmedia_size_other_height,newmedia_size_other_width,newmaterial,newrun_up,newillumination,newvisibility,newangle;
 
     List<Structure> structureList;
     List<Size> sizeList;
@@ -74,7 +76,7 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
     List<Angle> angleList;
     ArrayList<MediaOwner> mediaOwnerList;
 
-    EditText txtSubmissionDate, etxBrand, etxTown, etxComment, etxSiteReferenceNumber;
+    EditText txtSubmissionDate, etxBrand, etxTown,  etxComment, etxSiteReferenceNumber;
     TextView txtMediaOwnerHidden, txtOtherHWHidden;
 
     Button btnContinue;
@@ -103,9 +105,14 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
         mAwesomeValidation = new AwesomeValidation(BASIC);
 
         gps = new GPSTracker(this);
-        db= new DatabaseHandler(this);
+        db = new DatabaseHandler(this);
 
         submission_id = getIntent().getIntExtra("submission_id", 0);
+        data_type_sides = getIntent().getIntExtra("data_type_sides", 0);
+        side = getIntent().getStringExtra("side");
+        draft = getIntent().getIntExtra("newdraft", 0);
+
+        //Log.d("submission_id", String.valueOf(submission_id));
 
         if (submission_id == 0) {
             if (gps.canGetLocation()) {
@@ -121,7 +128,7 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
             } else {
                 gps.showSettingsAlert();
             }
-        }else{
+        } else {
             submission = db.draftSubmission(submission_id);
 
             latitude = Double.parseDouble(submission.get_latitude());
@@ -131,12 +138,18 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
         user = Manager.getInstance(context).getUser();
 
         getSupportActionBar().setTitle("Data Submission");
-        getSupportActionBar().setSubtitle("Monitoring Data");
+        if (side != null) {
+
+            getSupportActionBar().setSubtitle("Monitoring Data Side" + side);
+        } else {
+
+            getSupportActionBar().setSubtitle("Monitoring Data");
+        }
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         media_size_spinner = (Spinner) findViewById(R.id.media_size);
-        material_type_spinner  = (Spinner) findViewById(R.id.media_material_type);
+        material_type_spinner = (Spinner) findViewById(R.id.media_material_type);
         run_up_spinner = (Spinner) findViewById(R.id.media_run_up);
         illumination_spinner = (Spinner) findViewById(R.id.media_illumination);
         visibility_spinner = (Spinner) findViewById(R.id.media_visibility);
@@ -247,10 +260,48 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
 
         txtSubmissionDate.setEnabled(false);
         txtSubmissionDate.setFocusable(false);
+        if(side == null || side =="A" || side.equals("A") ) {
+            if (latitude == 0.0 || longitude == 0.0) {
+                btnContinue.setVisibility(View.GONE);
+                Toast.makeText(this, "Could not establish the exact coordinates. You will not be able to submit your data", Toast.LENGTH_LONG).show();
+            }
+        }
 
-        if (latitude == 0.0 || longitude == 0.0){
-            btnContinue.setVisibility(View.GONE);
-            Toast.makeText(this, "Could not establish the exact coordinates. You will not be able to submit your data", Toast.LENGTH_LONG).show();
+        if(side == null || side =="A" || side.equals("A") ) {
+
+            if (InternetChecker.getInstance(context).isNetworkAvailable()) {
+                Geocoder gcd = new Geocoder(context, Locale.getDefault());
+                List<Address> addresses = null;
+                try {
+                    addresses = gcd.getFromLocation(latitude, longitude, 2);
+                    if (addresses.size() > 0) {
+
+                        Log.d("latitude", String.valueOf(addresses));
+                        //String picked_town = addresses.get(0).getLocality();
+                        String picked_town = addresses.get(0).getLocality();
+                        //Log.d("latitude adminarea", addresses.get(0).getAdminArea());
+                        //Log.d("latitude locality", addresses.get(0).getLocality());
+                        //Log.d("latitude sublocality", addresses.get(0).getSubLocality());
+                        //Log.d("latitude", addresses.get(0).getFeatureName());
+                        etxTown.setText(picked_town);
+                        //etxTown.setEnabled(false);
+                    } else {
+                        Toast.makeText(context, "Could not get town AC", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e("LocationError", e.getMessage());
+//                e.printStackTrace();
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "There is no internet connection. Cannot get town", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+
+            //Toast.makeText(context, "We are on side B and C", Toast.LENGTH_SHORT).show();
+
+
+
         }
 
         if (submission_id != 0){
@@ -261,7 +312,7 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
             etxTown.setText(submission.get_town());
             txtMediaOwnerHidden.setText(submission.get_media_owner());
 
-            if (!submission.get_media_size_other_width().equals("0") && !submission.get_media_size_other_height().equals("0")){
+            if (submission.get_media_size_other_width() != null && !submission.get_media_size_other_width().equals("0") && !submission.get_media_size_other_height().equals("0") && submission.get_media_size_other_height() != null){
                 other_height = submission.get_media_size_other_height();
                 other_width = submission.get_media_size_other_width();
 
@@ -269,7 +320,7 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
             }
 
             MediaOwner owner = new MediaOwner();
-            if (!submission.get_media_owner().isEmpty()){
+            if (submission.get_media_owner() != null && !submission.get_media_owner().isEmpty()){
                 owner = db.getMediaOwner(Integer.parseInt(submission.get_media_owner()));
                 int media_owner_select = mediaOwnerList.indexOf(owner);
                 autoCompleteTextView.setListSelection(media_owner_select);
@@ -319,6 +370,24 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
                 if (angle.get_id() == Integer.parseInt(submission.get_angle()))
                     angle_spinner.setSelection(i);
             }
+
+            Log.d("side", "side");
+            Log.d("side", submission.get_side());
+
+            if(submission.get_side() =="B" || submission.get_side() =="C" || submission.get_side().equals("B") || submission.get_side().equals("C")){
+               if(submission.get_side().equals("B")  || submission.get_side() =="B" ){}
+
+                txtSubmissionDate.setEnabled(false);
+                etxSiteReferenceNumber.setEnabled(false);
+                etxTown.setEnabled(false);
+                autoCompleteTextView.setEnabled(false);
+                material_type_spinner.setEnabled(false);
+                structure_spinner.setEnabled(false);
+                material_type_spinner.setEnabled(false);
+                media_size_spinner.setEnabled(false);
+
+
+            }
         }
 
         callCalendar();
@@ -330,14 +399,100 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
 
             case R.id.continue_btn:
                 if(mAwesomeValidation.validate()) {
+                    int selected_structure_position = structure_spinner.getSelectedItemPosition();
+                    int selected_media_size = media_size_spinner.getSelectedItemPosition();
+                    int selected_material = material_type_spinner.getSelectedItemPosition();
+                    int selected_run_up = run_up_spinner.getSelectedItemPosition();
+                    int selected_illumination_type = illumination_spinner.getSelectedItemPosition();
+                    int selected_visibility = visibility_spinner.getSelectedItemPosition();
+                    int selected_angle = angle_spinner.getSelectedItemPosition();
+
+                    final Structure structure = structureList.get(selected_structure_position);
+                    final Size size = sizeList.get(selected_media_size);
+                    final Material material = materialList.get(selected_material);
+                    final RunUp runup = runUpList.get(selected_run_up);
+                    final Illumination illumination = illuminationList.get(selected_illumination_type);
+                    final Visibility visibility = visibilityList.get(selected_visibility);
+                    final Angle angle = angleList.get(selected_angle);
+
                     if (submission_id != 0) {
                         updateDraft();
+                        Intent intent = new Intent(this, MonitoringSubmissionPhotosActivity.class);
+                        if(data_type_sides==3 || data_type_sides == 2 && side==null || side =="A" || side=="B"){
+                            intent.putExtra("newdraft", 1);
+                        }
+                        if(draft==1 &&  data_type_sides == 2 || data_type_sides == 3){
+                            intent.putExtra("newdraft", 0);
+                        }
+
+                        if(draft==1 &&  data_type_sides == 3  && side=="C"){
+                            intent.putExtra("newdraft", 0);
+                        }
+
+                        intent.putExtra("submission_id", submission_id);
+                        intent.putExtra("side",submission.get_side());
+                        intent.putExtra("newtown", submission.get_town());
+                        intent.putExtra("newsubmission_date", submission.get_site_reference_number());
+                        intent.putExtra("newreference_number", submission.get_site_reference_number());
+                        intent.putExtra("newmedia_owner", submission.get_media_owner());
+                        intent.putExtra("newmedia_owner_name", submission.get_media_owner_name());
+                        intent.putExtra("newstructure", submission.get_structure());
+                        intent.putExtra("newsize",submission.get_size());
+                        intent.putExtra("newmedia_size_other_height", submission.get_media_size_other_height());
+                        intent.putExtra("newmedia_size_other_width", submission.get_media_size_other_width());
+                        intent.putExtra("newmaterial", submission.get_material());
+                        intent.putExtra("newrun_up", submission.get_run_up());
+                        intent.putExtra("newillumination", submission.get_illumination());
+                        intent.putExtra("newvisibility",submission.get_visibility());
+                        intent.putExtra("newangle", submission.get_angle());
+                        intent.putExtra("newlatitude", submission.get_latitude());
+                        intent.putExtra("newlongitude",submission.get_longitude());
+                        intent.putExtra("newuser_id", user.get_id());
+                        intent.putExtra("newbrand", submission.get_brand());
+
+                        startActivity(intent);
+
                     } else {
+
+                        Intent intent = new Intent(this, MonitoringSubmissionPhotosActivity.class);
+                        if(data_type_sides==3 || data_type_sides == 2 && side==null || side =="A" || side=="B"){
+                            intent.putExtra("newdraft", 1);
+                        }
+                        if(draft==1 &&  data_type_sides == 2 || data_type_sides == 3){
+                            intent.putExtra("newdraft", 0);
+                        }
+
+                        if(draft==1 &&  data_type_sides == 3  && side=="C"){
+                            intent.putExtra("newdraft", 0);
+                        }
+
                         saveDraft();
+
+                        intent.putExtra("side", "A");
+                        intent.putExtra("submission_id", submission_id);
+                        intent.putExtra("newtown", etxTown.getText().toString());
+                        intent.putExtra("newsubmission_date", txtSubmissionDate.getText().toString());
+                        intent.putExtra("newreference_number", etxSiteReferenceNumber.getText().toString());
+                        intent.putExtra("newmedia_owner", txtMediaOwnerHidden.getText().toString());
+                        intent.putExtra("newmedia_owner_name", autoCompleteTextView.getText().toString());
+                        intent.putExtra("newstructure", String.valueOf(structure.get_type_id()));
+                        intent.putExtra("newsize", String.valueOf(size.get_id()));
+                        intent.putExtra("newmedia_size_other_height", other_height);
+                        intent.putExtra("newmedia_size_other_width", other_width);
+                        intent.putExtra("newmaterial", String.valueOf(material.get_id()));
+                        intent.putExtra("newrun_up", String.valueOf(runup.get_id()));
+                        intent.putExtra("newillumination", String.valueOf(illumination.get_id()));
+                        intent.putExtra("newvisibility", String.valueOf(visibility.get_id()));
+                        intent.putExtra("newangle", String.valueOf(angle.get_id()));
+                        intent.putExtra("newlatitude", latitude);
+                        intent.putExtra("newlongitude",longitude);
+                        intent.putExtra("newuser_id", user.get_id());
+                        intent.putExtra("newbrand", etxBrand.getText().toString());
+
+
+                        startActivity(intent);
                     }
-                    Intent intent = new Intent(this, MonitoringSubmissionPhotosActivity.class);
-                    intent.putExtra("submission_id", submission_id);
-                    startActivity(intent);
+
                 }else{
                     Toast.makeText(context, "You have some errors that you need to attend to", Toast.LENGTH_SHORT).show();
                 }
@@ -385,6 +540,10 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
         inputSubmission.set_longitude(String.valueOf(longitude));
         inputSubmission.set_user_id(user.get_id());
         inputSubmission.set_status(-1);
+        inputSubmission.set_parentid(submission_id);
+        if(side!="B" || side!="C") {
+            inputSubmission.set_side("A");
+        }
 
         return inputSubmission;
     }
@@ -396,31 +555,13 @@ public class MonitoringDataSubmission extends AppCompatActivity implements View.
 
     private void saveDraft() {
         ContentValues values = new ContentValues();
-
-//        values.put(DatabaseHandler.KEY_SUBMISSION_DATE, txtSubmissionDate.getText().toString());
-//        values.put(DatabaseHandler.KEY_SITE_REFERENCE, etxSiteReferenceNumber.getText().toString());
-//        values.put(DatabaseHandler.KEY_BRAND, etxBrand.getText().toString());
-//        values.put(DatabaseHandler.KEY_MEDIA_OWNER_ID, txtMediaOwnerHidden.getText().toString());
-//        values.put(DatabaseHandler.KEY_TOWN, etxTown.getText().toString());
-//        values.put(DatabaseHandler.KEY_STRUCTURE_ID, structureList.get(structure_spinner.getSelectedItemPosition()).get_type_id());
-//        values.put(DatabaseHandler.KEY_MEDIA_SIZE_ID, sizeList.get(media_size_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_MEDIA_SIZE_HEIGHT, other_height);
-//        values.put(DatabaseHandler.KEY_MEDIA_SIZE_WIDTH, other_width);
-//        values.put(DatabaseHandler.KEY_MATERIAL_TYPE_ID, materialList.get(material_type_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_RUN_UP_ID, runUpList.get(run_up_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_ILLUMINATION_ID, illuminationList.get(illumination_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_VISIBILITY_ID, visibilityList.get(visibility_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_ANGLE_ID, angleList.get(angle_spinner.getSelectedItemPosition()).get_id());
-//        values.put(DatabaseHandler.KEY_OTHER_COMMENTS, etxComment.getText().toString());
-
-
-
         long id = db.addDraftSubmission(getInput());
 
         submission_id = Integer.valueOf(String.valueOf(id));
 
         Toast.makeText(context, "Saved to draft", Toast.LENGTH_SHORT).show();
     }
+
 
     @Override
     protected Dialog onCreateDialog(int id) {

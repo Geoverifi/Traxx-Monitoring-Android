@@ -1,8 +1,13 @@
 package com.geoverifi.geoverifi;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.widget.TextView;
+/**
+ * Created by carolyne on 12/18/17.
+ */
+
+
+        import android.support.v7.app.AppCompatActivity;
+        import android.os.Bundle;
+        import android.widget.TextView;
 
 public class ErrorActivity extends AppCompatActivity {
 

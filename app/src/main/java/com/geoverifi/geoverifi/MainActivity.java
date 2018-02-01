@@ -7,18 +7,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.geoverifi.geoverifi.adapter.RecyclerViewAdapter;
 import com.geoverifi.geoverifi.app.MyApp;
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         rv.setLayoutManager(llm);
 
         db = new DatabaseHandler(this);
-        menuList = db.allMenuItems(usertype);
+        menuList = db.Mainmenu(usertype);
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
 

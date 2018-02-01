@@ -49,6 +49,9 @@
         </provider>
 
         <activity android:name=".MainActivity" />
+        <activity android:name=".MainUtraxxActivity" />
+        <activity android:name=".MainItraxxActivity" />
+
         <activity
             android:name=".LoginActivity"
             android:theme="@style/LoginStyle" />
@@ -69,6 +72,13 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".DataSubmissionAuditingActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
             android:name=".AccountActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -83,6 +93,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <activity
+            android:name=".ViewSubmissionsAuditingActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+
         <activity
             android:name=".SubmissionActivity"
             android:label="@string/title_activity_submission"
@@ -92,6 +112,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ViewSubmissionsActivity" />
         </activity>
+
+        <activity
+            android:name=".SubmissionAuditingActivity"
+            android:label="@string/title_activity_submission"
+            android:parentActivityName=".ViewSubmissionsAuditingActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ViewSubmissionsActivity" />
+        </activity>
+
+
         <activity
             android:name=".ViewInMapActivity"
             android:parentActivityName=".ViewSubmissionsActivity">
@@ -107,7 +139,37 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".OfflineDataAuditingActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
             android:name=".RegisterActivity"
+            android:parentActivityName=".LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
+
+        <activity
+            android:name=".ForgotPassword"
+            android:parentActivityName=".LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
+
+        <activity
+            android:name=".ResetPassword"
+            android:parentActivityName=".LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
+        <activity
+            android:name=".RegThankyou"
             android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -115,11 +177,20 @@
         </activity>
         <activity
             android:name=".MonitoringDataSubmission"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainUtraxxActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <activity
+        android:name=".MonitoringDataSubmissionAuditing"
+        android:parentActivityName=".MainItraxxActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+    </activity>
+
 
         <service android:name=".service.AuthenticatorService">
             <intent-filter>
@@ -143,9 +214,31 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <service
+            android:name=".sync.SyncAuditingService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncauditingadapter" />
+        </service>
+
         <provider
             android:name=".provider.SubmissionProvider"
             android:authorities="com.geoverifi.geoverifi.provider.SubmissionProvider"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="true"
+            android:syncable="true" />
+
+        <provider
+            android:name=".provider.SubmissionAuditingProvider"
+            android:authorities="com.geoverifi.geoverifi.provider.SubmissionAuditingProvider"
+            android:enabled="true"
             android:exported="true"
             android:multiprocess="true"
             android:syncable="true" />
@@ -154,6 +247,15 @@
             android:authorities="com.geoverifi.geoverifi.provider.SubmissionPhotosProvider"
             android:name=".provider.SubmissionPhotosProvider"
             android:exported="true"
+            android:enabled="true"
+            android:multiprocess="true"
+            android:syncable="false" />
+
+        <provider
+            android:authorities="com.geoverifi.geoverifi.provider.SubmissionPhotosAuditingProvider"
+            android:name=".provider.SubmissionPhotosAuditingProvider"
+            android:exported="true"
+            android:enabled="true"
             android:multiprocess="true"
             android:syncable="false" />
 
@@ -165,13 +267,24 @@
             android:name=".MonitoringSubmissionReviewActivity"
             android:label="@string/title_activity_monitoring_submission_review"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity android:name=".DraftSubmissionsActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-        <activity android:name=".ErrorActivity"></activity>
+            android:parentActivityName=".MainActivity"/>
+
+        <activity
+            android:name=".MonitoringSubmissionReviewAuditingActivity"
+            android:label="@string/title_activity_monitoring_submission_review"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity android:name=".DraftSubmissionsAuditingActivity"
+            android:parentActivityName=".MainActivity"/>
+
+        <activity
+            android:name=".MonitoringSubmissionPhotosAuditingActivity"
+            android:label="@string/title_activity_monitoring_submission_photos"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
     </application>
 
 </manifest>

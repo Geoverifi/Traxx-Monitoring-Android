@@ -4,31 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextPaint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.geoverifi.geoverifi.AccountActivity;
-import com.geoverifi.geoverifi.DataSubmissionActivity;
 import com.geoverifi.geoverifi.MainActivity;
-import com.geoverifi.geoverifi.MonitoringDataSubmission;
+import com.geoverifi.geoverifi.MainItraxxActivity;
+import com.geoverifi.geoverifi.MainUtraxxActivity;
 import com.geoverifi.geoverifi.R;
-import com.geoverifi.geoverifi.SplashActivity;
-import com.geoverifi.geoverifi.ViewSubmissionsActivity;
 import com.geoverifi.geoverifi.model.Menu;
 
 import java.util.List;
@@ -77,15 +67,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 String slug = txtSlug.getText().toString();
                 Class newActivity = null;
                 switch (slug){
-                    case "enter_data_action":
-                        newActivity = MonitoringDataSubmission.class;
+                    case "utraxx_action":
+                        newActivity = MainUtraxxActivity.class;
+                        break;
+
+                    case "itraxx_action":
+                        newActivity = MainItraxxActivity.class;
                         break;
                     case "my_account":
                         newActivity = AccountActivity.class;
-                        break;
-
-                    case "view_data_action":
-                        newActivity = ViewSubmissionsActivity.class;
                         break;
                     default:
                         newActivity = MainActivity.class;

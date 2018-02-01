@@ -114,6 +114,7 @@ public class ReviewDataFragment extends Fragment {
             data.setData(submission.get_town());
             list.add(data);
 
+
             data = new ReviewData();
             data.setTitle(getContext().getString(R.string.prompt_structure));
             data.setData(db.getStructure(Integer.parseInt(submission.get_structure())).get_type_name());

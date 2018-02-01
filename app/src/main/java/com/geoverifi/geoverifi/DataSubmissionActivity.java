@@ -6,28 +6,23 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -36,9 +31,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.geoverifi.geoverifi.adapter.AngleSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.IlluminationSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.MaterialSpinnerAdapter;
@@ -47,8 +42,6 @@ import com.geoverifi.geoverifi.adapter.RunUpSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.SizeSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.StructureSpinnerAdapter;
 import com.geoverifi.geoverifi.adapter.VisibilitySpinnerAdapter;
-import com.geoverifi.geoverifi.app.AppController;
-import com.geoverifi.geoverifi.app.VolleyMultipartRequest;
 import com.geoverifi.geoverifi.config.Variables;
 import com.geoverifi.geoverifi.db.DatabaseHandler;
 import com.geoverifi.geoverifi.helper.InternetChecker;
@@ -62,14 +55,12 @@ import com.geoverifi.geoverifi.model.Structure;
 import com.geoverifi.geoverifi.model.Submission;
 import com.geoverifi.geoverifi.model.User;
 import com.geoverifi.geoverifi.model.Visibility;
-import com.geoverifi.geoverifi.module.AppHelper;
 import com.geoverifi.geoverifi.server.client.SubmissionClient;
 import com.geoverifi.geoverifi.server.model.Response;
 import com.geoverifi.geoverifi.service.GPSTracker;
 import com.geoverifi.geoverifi.sharedpreference.Manager;
 import com.geoverifi.geoverifi.util.FileUtils;
 import com.geoverifi.geoverifi.util.Picture;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -135,16 +126,19 @@ public class DataSubmissionActivity extends AppCompatActivity implements View.On
         setContentView(R.layout.activity_data_submission);
         user = Manager.getInstance(context).getUser();
 
-        gps = new GPSTracker(DataSubmissionActivity.this);
+        gps = new GPSTracker(this);
         etxTown = (EditText) findViewById(R.id.input_town);
 
 
+        Toast.makeText(context, String.valueOf(latitude), Toast.LENGTH_SHORT).show();
         if(gps.canGetLocation()){
 
             latitude = gps.getLatitude();
             longitude = gps.getLongitude();
 
             Toast.makeText(context, String.valueOf(latitude), Toast.LENGTH_SHORT).show();
+            Log.d("latitude", String.valueOf(latitude));
+            Log.d("latitude lomg", String.valueOf(longitude));
 
             if (InternetChecker.getInstance(context).isNetworkAvailable()) {
                 Geocoder gcd = new Geocoder(context, Locale.getDefault());
@@ -154,9 +148,9 @@ public class DataSubmissionActivity extends AppCompatActivity implements View.On
                     if (addresses.size() > 0) {
                         String picked_town = addresses.get(0).getLocality();
                         etxTown.setText(picked_town);
-                        etxTown.setEnabled(false);
+                        //etxTown.setEnabled(false);
                     } else {
-                        Toast.makeText(context, "Could not get town A", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Could not get town AB", Toast.LENGTH_SHORT).show();
                     }
                 } catch (IOException e) {
                     Log.e("LocationError", e.getMessage());
@@ -167,7 +161,7 @@ public class DataSubmissionActivity extends AppCompatActivity implements View.On
                 Toast.makeText(context, "There is no internet connection. Cannot get town", Toast.LENGTH_SHORT).show();
             }
 
-            // \n is for new line
+            // \n is fodr new line
 
         }else{
             // can't get location
@@ -320,6 +314,7 @@ public class DataSubmissionActivity extends AppCompatActivity implements View.On
             case R.id.submit_button:
 
                 if (InternetChecker.getInstance(context).isNetworkAvailable() == false){
+
                     saveoffline();
                     Toast.makeText(context, "Submission saved on device. It will be submitted as soon as you go online", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(context, OfflineDataActivity.class));

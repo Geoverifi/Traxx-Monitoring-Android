@@ -5,11 +5,11 @@ package com.geoverifi.geoverifi.server.model;
  */
 
 public class Submission {
-    private String submission_date, brand, media_owner, town, other_comments;
-    private Integer structure_id, media_size, media_size_other_height, media_size_other_width, material_type_id, run_up_id, illumination_type_id, visibility, angle, user_id;
+    private String submission_date, brand, media_owner, town, other_comments,side;
+    private Integer structure_id, media_size, media_size_other_height, media_size_other_width, material_type_id, run_up_id, illumination_type_id, visibility, angle, user_id,parentid;
     private double latitude, longitude;
 
-    public Submission(String submission_date, String brand, String media_owner, String town, String other_comments, Integer structure_id, Integer media_size, Integer media_size_other_height, Integer media_size_other_width, Integer material_type_id, Integer run_up_id, Integer illumination_type_id, Integer visibility, Integer angle, Integer latitude, Integer longitude, Integer user_id) {
+    public Submission(String submission_date, String brand, String media_owner, String town, String other_comments, Integer structure_id, Integer media_size, Integer media_size_other_height, Integer media_size_other_width, Integer material_type_id, Integer run_up_id, Integer illumination_type_id, Integer visibility, Integer angle, Integer latitude, Integer longitude, Integer user_id, String side, Integer parentid) {
         this.submission_date = submission_date;
         this.brand = brand;
         this.media_owner = media_owner;
@@ -27,6 +27,9 @@ public class Submission {
         this.latitude = latitude;
         this.longitude = longitude;
         this.user_id = user_id;
+        this.side = side;
+        this.parentid = parentid;
+
     }
 
     public Submission(){
@@ -167,5 +170,23 @@ public class Submission {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+
+    public String getSide() {
+        return side;
+    }
+
+    public void setSide(String side) {
+        this.side = side;
+    }
+
+
+    public Integer getParentid() {
+        return parentid;
+    }
+
+    public void setParentid(Integer parentid) {
+        this.parentid = parentid;
     }
 }
